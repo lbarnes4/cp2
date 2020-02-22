@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+	<head>
+		<meta charset='UTF-8' />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Creative Project 2</title>
+		<link rel='stylesheet' href='styles.css' />
+	</head>
+
+	<body>
+		<div class="header">
+			<div style="display: flex; flex-direction: column; height: 100%; width: 30%; min-width: 200px;">
+				<div style="width: 100%; height: 50px; display: flex; justify-content: space-around">
+					<a href="#" class="button header-button" id="sign-in-or-out-button">Sign In/Authorize</a>
+					<a href="#" class="button header-button" id="revoke-access-button">Revoke access</a>
+				</div>
+				<div id="auth-status" style="width: 100%; padding-left: 10px;"></div>
+			</div>
+			<div class="api-options">
+				<div class="api-option">
+					<input type="checkbox" id="bucks" class="checkbox" onclick="requestCalendars()"/>
+					<label>Milwakee Bucks</label>
+				</div>
+				<div class="api-option">
+					<input type="checkbox" id="lakers" class="checkbox" onclick="requestCalendars()"/>
+					<label>LA Lakers</label>
+				</div>
+				<div class="api-option">
+					<input type="checkbox" id="celtics" class="checkbox" onclick="requestCalendars()"/>
+					<label>Boston Celtics</label>
+				</div>
+				<div class="api-option">
+					<input type="checkbox" id="raptors" class="checkbox" onclick="requestCalendars()"/>
+					<label>Toronto Raptors</label>
+				</div>
+			</div>
+		</div>
+		<div class="calendar">
+			<div class="calendar-nav">
+				<div style="display: flex; margin-right: auto;">
+					<a id="previousWeek" class="button" href="#"><<</a>
+					<a id="previousDay" class="button" href="#"><</a>
+					<a id="today" class="button" href="#">Today</a>
+				</div>
+				<div id="month" style="align-self: center"><strong></strong></div>
+				<div style="display: flex; margin-left: auto;">
+					<a id="nextDay" class="button" href="#">></a>
+					<a id="nextWeek" class="button" href="#">>></a>
+				</div>
+			</div>
+			<div class="calendar-body">
+				<div class="calendar-scroll-body">
+					<div class="calendar-column" style="width: 100px;">
+						<br /><br />
+						<div style="min-height: 59px; width: 100%;"></div>
+						<p>1:00 am</p><br /><br />
+						<p>2:00 am</p><br /><br />
+						<p>3:00 am</p><br /><br />
+						<p>4:00 am</p><br /><br />
+						<p>5:00 am</p><br /><br />
+						<p>6:00 am</p><br /><br />
+						<p>7:00 am</p><br /><br />
+						<p>8:00 am</p><br /><br />
+						<p>9:00 am</p><br /><br />
+						<p>10:00 am</p><br /><br />
+						<p>11:00 am</p><br /><br />
+						<p>12:00 pm</p><br /><br />
+						<p>1:00 pm</p><br /><br />
+						<p>2:00 pm</p><br /><br />
+						<p>3:00 pm</p><br /><br />
+						<p>4:00 pm</p><br /><br />
+						<p>5:00 pm</p><br /><br />
+						<p>6:00 pm</p><br /><br />
+						<p>7:00 pm</p><br /><br />
+						<p>8:00 pm</p><br /><br />
+						<p>9:00 pm</p><br /><br />
+						<p>10:00 pm</p><br /><br />
+						<p>11:00 pm</p><br /><br />
+					</div>
+					<div class="days">
+						<div id="dayColumn" class="calendar-column">
+							<div class="day-header" id="day1"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day2"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day3"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day4"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day5"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day6"></div>
+						</div>
+						<div class="calendar-column">
+							<div class="day-header" id="day7"></div>
+						</div>
+						<hr style="top: 104px" />
+						<hr style="top: 158px" />
+						<hr style="top: 212px" />
+						<hr style="top: 266px" />
+						<hr style="top: 320px" />
+						<hr style="top: 374px" />
+						<hr style="top: 428px" />
+						<hr style="top: 482px" />
+						<hr style="top: 536px" />
+						<hr style="top: 590px" />
+						<hr style="top: 644px" />
+						<hr style="top: 698px" />
+						<hr style="top: 752px" />
+						<hr style="top: 806px" />
+						<hr style="top: 860px" />
+						<hr style="top: 914px" />
+						<hr style="top: 968px" />
+						<hr style="top: 1022px" />
+						<hr style="top: 1076px" />
+						<hr style="top: 1130px" />
+						<hr style="top: 1184px" />
+						<hr style="top: 1238px" />
+						<hr style="top: 1292px" />
+						<hr style="top: 1346px" />
+						<div id="events"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer"><a href="#">My GitHub</a></div>
+		<hr id="time-bar" />
+
+		<script src="https://apis.google.com/js/api.js"></script>
+		<script>
+			var GoogleAuth;
+var SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+function handleClientLoad() {
+	// Load the API's client and auth2 modules.
+	// Call the initClient function after the modules load.
+	gapi.load('client:auth2', initClient);
+}
+
+function initClient() {
+	// Retrieve the discovery document for version 3 of Google Drive API.
+	// In practice, your app can retrieve one or more discovery documents.
+	var discoveryUrl = "https://content.googleapis.com/discovery/v1/apis/calendar/v3/rest";
+
+	// Initialize the gapi.client object, which app uses to make API requests.
+	// Get API key and client ID from API Console.
+	// 'scope' field specifies space-delimited list of access scopes.
+	gapi.client.init({
+		'apiKey': 'AIzaSyD5HJfXB-5qzHaP2Mqes-OwbHW2r3UWnS8',
+		'clientId': '50253400041-n41gv8achir9pspu8ookf4fq848b3fbk.apps.googleusercontent.com',
+		'discoveryDocs': [discoveryUrl],
+		'scope': SCOPE
+	}).then(function () {
+		GoogleAuth = gapi.auth2.getAuthInstance();
+
+		// Listen for sign-in state changes.
+		GoogleAuth.isSignedIn.listen(updateSigninStatus);
+
+		// Handle initial sign-in state. (Determine if user is already signed in.)
+		var user = GoogleAuth.currentUser.get();
+		setSigninStatus();
+
+		// Call handleAuthClick function when user clicks on
+		//      "Sign In/Authorize" button.
+		$('#sign-in-or-out-button').click(function () {
+			handleAuthClick();
+		});
+		$('#revoke-access-button').click(function () {
+			revokeAccess();
+		});
+	});
+}
+
+function handleAuthClick() {
+	if (GoogleAuth.isSignedIn.get()) {
+		// User is authorized and has clicked "Sign out" button.
+		GoogleAuth.signOut();
+	} else {
+		// User is not signed in. Start Google auth flow.
+		GoogleAuth.signIn();
+	}
+}
+
+function revokeAccess() {
+	GoogleAuth.disconnect();
+}
+
+var currentApiRequest;
+var isAuthorized;
+var allEvents = [];
+
+function setSigninStatus(isSignedIn) {
+	var user = GoogleAuth.currentUser.get();
+	isAuthorized = user.hasGrantedScopes(SCOPE);
+	if (isAuthorized) {
+		$('#sign-in-or-out-button').html('Sign out');
+		$('#revoke-access-button').css('display', '');
+		$('#auth-status').html('Signed in. Click the checkboxes to view game schedules.');
+		var elements = document.getElementsByClassName("checkbox");
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].disabled = false;
+		}
+	} else {
+		$('#sign-in-or-out-button').html('Sign In/Authorize');
+		$('#revoke-access-button').css('display', 'none');
+		$('#auth-status').html('Sign in and provide permissions (read only) to view game schedules.');
+		var elements = document.getElementsByClassName("checkbox");
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].disabled = true;
+		}
+	}
+}
+
+function updateSigninStatus(isSignedIn) {
+	setSigninStatus();
+}
+
+
+/**
+ * Store the request details. Then check to determine whether the user
+ * has authorized the application.
+ *   - If the user has granted access, make the API request.
+ *   - If the user has not granted access, initiate the sign-in flow.
+ */
+function sendAuthorizedApiRequest(requestDetails) {
+	currentApiRequest = requestDetails;
+	if (isAuthorized) {
+		// Make API request
+		return gapi.client.calendar.events.list(requestDetails)
+			.then(function (response) {
+				// Handle the results here (response.result has the parsed body).
+				allEvents = allEvents.concat(response.result.items);
+			}, function (err) {
+				console.error("Error: ", err);
+			});
+
+		// Reset currentApiRequest variable.
+		currentApiRequest = {};
+	} else {
+		GoogleAuth.signIn();
+	}
+}
+
+
+
+Date.prototype.addDays = function (days) {
+	var date = new Date(this.valueOf());
+	date.setDate(date.getDate() + days);
+	return date;
+}
+var firstDay = new Date();
+
+
+function print() {
+	var month;
+	switch (firstDay.getMonth()) {
+		case 0:
+			month = "January";
+			break;
+		case 1:
+			month = "February";
+			break;
+		case 2:
+			month = "March";
+			break;
+		case 3:
+			month = "April";
+			break;
+		case 4:
+			month = "May";
+			break;
+		case 5:
+			month = "June";
+			break;
+		case 6:
+			month = "July";
+			break;
+		case 7:
+			month = "August";
+			break;
+		case 8:
+			month = "September";
+			break;
+		case 9:
+			month = "October";
+			break;
+		case 10:
+			month = "Novermber";
+			break;
+		case 11:
+			month = "December";
+			break;
+	}
+	month += " " + firstDay.getFullYear();
+	document.getElementById("month").innerHTML = month;
+	for (var i = 1; i <= 7; i++) {
+		var value = "<p>" + firstDay.addDays(i - 1).getDate() + "</p>";
+		var weekDay;
+		switch(firstDay.addDays(i - 1).getDay()) {
+			case 0:
+				weekDay = "Sunday";
+				break;
+			case 1:
+				weekDay = "Monday";
+				break;
+			case 2:
+				weekDay = "Tuesday";
+				break;
+			case 3:
+				weekDay = "Wednesday";
+				break;
+			case 4:
+				weekDay = "Thursday";
+				break;
+			case 5:
+				weekDay = "Friday";
+				break;
+			case 6:
+				weekDay = "Saturday";
+				break;
+		}
+		value += "<p>" + weekDay + "</p>";
+		document.getElementById("day" + i).innerHTML = value;
+	}
+	if (allEvents) {
+		var results = "";
+		for (var i = 0; i < allEvents.length; i++) {
+			var numDays = Math.trunc((new Date(allEvents[i].start.dateTime).getTime() - firstDay.getTime())/(1000*3600*24));
+			if (numDays >= 0 && numDays < 7) {
+				var columnWidth = document.getElementById("dayColumn").offsetWidth;
+				var startPixel = ((new Date(allEvents[i].start.dateTime)).getHours() * 60 + (new Date(allEvents[i].start.dateTime)).getMinutes()) * 54 / 60 + 50;
+				var endPixel = ((new Date(allEvents[i].end.dateTime)).getHours() * 60 + (new Date(allEvents[i].end.dateTime)).getMinutes()) * 54 / 60;
+				var pixelHeight = endPixel - startPixel;
+				results += "<div class='event' style='left: calc(" + numDays + " * 100% / 7 + 100% / 7 * .03); width: calc(100% / 7 * .94); top: " + startPixel + "px; height: " + pixelHeight + "px'>" + allEvents[i].summary + "</div>";
+			}
+		}
+		document.getElementById("events").innerHTML = results;
+	}
+}
+
+function requestCalendars() {
+	var listRequests = [];
+	allEvents = [];
+	if (document.getElementById("bucks").checked) {
+		listRequests.push( { 'calendarId': 'nba_15_%4dilwaukee+%42ucks#sports@group.v.calendar.google.com' });
+	}
+	if (document.getElementById("lakers").checked) {
+		listRequests.push( { 'calendarId': 'nba_13_%4cos+%41ngeles+%4cakers#sports@group.v.calendar.google.com' });
+	}
+	if (document.getElementById("raptors").checked) {
+		listRequests.push( { 'calendarId': 'nba_28_%54oronto+%52aptors#sports@group.v.calendar.google.com' });
+	}
+	if (document.getElementById("celtics").checked) {
+		listRequests.push( { 'calendarId': 'nba_2_%42oston+%43eltics#sports@group.v.calendar.google.com' });
+	}
+	var promises = [];
+	for (var i = 0; i < listRequests.length; i++ ) {
+		promises.push(sendAuthorizedApiRequest(listRequests[i]));
+	}
+	Promise.all(promises).then(function() {
+		print();
+
+	});
+};
+
+document.getElementById("previousWeek").addEventListener("click", function (event) {
+	event.preventDefault();
+	firstDay = firstDay.addDays(-7);
+	print();
+});
+document.getElementById("previousDay").addEventListener("click", function (event) {
+	event.preventDefault();
+	firstDay = firstDay.addDays(-1);
+	print();
+});
+document.getElementById("today").addEventListener("click", function (event) {
+	event.preventDefault();
+	firstDay = new Date();
+	print();
+});
+document.getElementById("nextDay").addEventListener("click", function (event) {
+	event.preventDefault();
+	firstDay = firstDay.addDays(1);
+	print();
+});
+document.getElementById("nextWeek").addEventListener("click", function (event) {
+	event.preventDefault();
+	firstDay = firstDay.addDays(7);
+	print();
+});
+print();
+
+		</script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script async defer src="https://apis.google.com/js/api.js"
+							 onload="this.onload=function(){};handleClientLoad()"
+		  onreadystatechange="if (this.readyState === 'complete') this.onload()">
+		</script>
+	</body>
+</html>
